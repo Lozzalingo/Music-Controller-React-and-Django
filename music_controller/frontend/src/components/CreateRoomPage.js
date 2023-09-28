@@ -83,12 +83,20 @@ export default function CreateRoomPage(props) {
             color="primary"
             variant="contained"
             onClick={handleRoomButtonPressed}
+            className="mediumWidth"  
           >
             Create A Room
           </Button>
         </Grid>
         <Grid item xs={12} align="center">
-          <Button color="secondary" variant="contained" to="/" component={Link}>
+          <Button 
+            color="secondary" 
+            variant="contained" 
+            to="/" 
+            component={Link}
+            className="mediumWidth"  
+          >
+            
             Back
           </Button>
         </Grid>

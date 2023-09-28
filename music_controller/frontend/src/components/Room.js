@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Grid, Button, Typography } from "@material-ui/core";
 import CreateRoomPage from "./CreateRoomPage";
+import MusicPlayer from "./MusicPlayer";
 
 function Room() {
   const { roomCode } = useParams();
@@ -11,9 +12,47 @@ function Room() {
     votesToSkip: 2,
     guestCanPause: false,
     isHost: false,
+    spotifyAuthenticated: false,
+    song: {},
   });
 
   const [showSettings, setShowSettings] = useState(false);
+
+  const authenticateSpotify = () => {
+    fetch("/spotify/is-authenticated")
+      .then((response) => response.json())
+      .then((data) => {
+        setRoomDetails((prevState) => ({
+          ...prevState,
+          spotifyAuthenticated: data.status,
+        }));
+        if (!data.status) {
+          fetch("/spotify/get-auth-url")
+            .then((response) => response.json())
+            .then((data) => {
+              window.location.replace(data.url);
+            });
+        }
+      });
+  };
+
+  const getCurrentSong = () => {
+    fetch("/spotify/current-song")
+    .then((response) => {
+      if (!response.ok) {
+        return {};
+      } else {
+        return response.json();
+      }
+    })
+    .then((data) => {
+      setRoomDetails((prevState) => ({
+        ...prevState,
+        song: data,
+      }));
+      console.log(data);
+    });
+  };
 
   const getRoomDetails = async () => {
     try {
@@ -28,6 +67,9 @@ function Room() {
         guestCanPause: data.guest_can_pause,
         isHost: data.is_host,
       });
+      if (data.is_host) {
+        authenticateSpotify();
+      }
     } catch (error) {
       console.error(error);
     }
@@ -35,7 +77,21 @@ function Room() {
 
   useEffect(() => {
     getRoomDetails();
+    getCurrentSong(); // Fetch the current song when the component mounts
   }, [roomCode, navigate]);
+
+
+  useEffect(() => {
+    getRoomDetails();
+    getCurrentSong(); // Fetch the current song when the component mounts
+
+    // Equivalent to componentDidMount
+    const interval = setInterval(getCurrentSong, 1000);
+
+    // Equivalent to componentWillUnmount
+    return () => clearInterval(interval);
+  }, [roomCode, navigate]);
+
 
   const leaveButtonPressed = async () => {
     try {
@@ -64,6 +120,7 @@ function Room() {
             guestCanPause={roomDetails.guestCanPause}
             roomCode={roomCode}
             updateCallback={getRoomDetails}
+            className="mediumWidth"  
           />
         </Grid>
         <Grid item xs={12} align="center">
@@ -71,12 +128,31 @@ function Room() {
             variant="contained"
             color="secondary"
             onClick={() => updateShowSettings(false)}
+            className="mediumWidth"  
           >
             Close
           </Button>
         </Grid>
       </Grid>
     );
+  };
+
+  const RenderSettingsButton = () => {
+    if (roomDetails.isHost) {
+      return (
+        <Grid item xs={12} align="center">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => updateShowSettings(true)}
+            className="mediumWidth"  
+          >
+            Settings
+          </Button>
+        </Grid>
+      );
+    }
+    return null;
   };
 
   const renderRoomDetails = () => {
@@ -88,34 +164,21 @@ function Room() {
           </Typography>
         </Grid>
         <Grid item xs={12} align="center">
-          <Typography variant="h6" component="h6">
-            Votes: {roomDetails.votesToSkip}
-          </Typography>
+          {}
         </Grid>
         <Grid item xs={12} align="center">
-          <Typography variant="h6" component="h6">
-            Guest Can Pause: {roomDetails.guestCanPause.toString()}
-          </Typography>
+          <MusicPlayer {...roomDetails.song} />
         </Grid>
         <Grid item xs={12} align="center">
-          <Typography variant="h6" component="h6">
-            Host: {roomDetails.isHost.toString()}
-          </Typography>
+          {}
         </Grid>
-        <Grid item xs={12} align="center">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => updateShowSettings(true)}
-          >
-            Settings
-          </Button>
-        </Grid>
+        <RenderSettingsButton />
         <Grid item xs={12} align="center">
           <Button
             variant="contained"
             color="secondary"
             onClick={leaveButtonPressed}
+            className="mediumWidth"  
           >
             Leave Room
           </Button>

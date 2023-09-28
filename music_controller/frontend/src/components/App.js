@@ -11,6 +11,7 @@ import { render } from "react-dom";
 import HomePage from "./HomePage";
 import CreateRoomPage from "./CreateRoomPage"; // Import the CreateRoomPage component
 import RoomPage from "./Room";
+import Info from "./Info";
 import RoomJoinPage from "./RoomJoinPage"; // Import the RoomPage component
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -26,6 +27,7 @@ export default class App extends Component {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/create" element={<CreateRoomPage />} />
+          <Route path="/info" element={<Info />} />
           <Route path="/join" element={<RoomJoinPage />} />
           <Route path="/room/:roomCode" element={<RoomPage />} /> {/* Define the room route */}
           {/* Add more routes as needed */}

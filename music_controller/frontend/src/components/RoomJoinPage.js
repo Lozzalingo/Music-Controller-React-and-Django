@@ -46,13 +46,14 @@ export default function RoomJoinPage(props) {
       </Grid>
       <Grid item xs={12} align="center">
         <TextField
-          error={error}
+          error={Boolean(error)}
           label="Code"
           placeholder="Enter a Room Code"
           value={roomCode}
-          helperText={error}
+          helperText={Boolean(error)}
           variant="outlined"
           onChange={handleTextFieldChange}
+          className="mediumWidth"
         />
       </Grid>
       <Grid item xs={12} align="center">
@@ -60,12 +61,18 @@ export default function RoomJoinPage(props) {
           variant="contained"
           color="primary"
           onClick={roomButtonPressed}
+        className="mediumWidth"  
         >
           Enter Room
         </Button>
       </Grid>
       <Grid item xs={12} align="center">
-        <Button variant="contained" color="secondary" to="/" component={Link}>
+        <Button 
+        variant="contained" 
+        color="secondary" 
+        to="/" 
+        component={Link} 
+        className="mediumWidth">
           Back
         </Button>
       </Grid>

@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import RoomJoinPage from "./RoomJoinPage";
 import CreateRoomPage from "./CreateRoomPage";
-import Room from "./Room";
 import { Grid, Button, ButtonGroup, Typography } from "@material-ui/core";
 import {
   BrowserRouter as Router,
@@ -11,6 +10,8 @@ import {
   Redirect,
   Navigate,
 } from "react-router-dom";
+import Info from "./Info";
+
 
 export default class HomePage extends Component {
   constructor(props) {
@@ -32,23 +33,48 @@ export default class HomePage extends Component {
 
   renderHomePage() {
     return (
-      <Grid container spacing={3}>
-        <Grid item xs={12} align="center">
-          <Typography variant="h3" compact="h3">
-            Music Controller
-          </Typography>
-        </Grid>
-        <Grid item xs={12} align="center">
-          <ButtonGroup disableElevation variant="contained" color="primary">
-            <Button color="primary" to="/join" component={Link}>
-              Join a Room
-            </Button>
-            <Button color="secondary" to="/create" component={Link}>
-              Create a Room
-            </Button>
-          </ButtonGroup>
-        </Grid>
+      <Grid container spacing={3} align="center" alignItems="center">
+      <Grid item xs={12} align="center">
+        <Typography variant="h3" color="black"  style={{
+          fontSize: "36px",
+          fontWeight: "bold",
+          color: "white",
+          backgroundColor: "#292929",
+          padding: "15px 20px",
+          borderRadius: "10px",
+        }}
+        >
+          DJ Vote System
+        </Typography>
       </Grid>
+      <Grid item xs={12} align="center">
+        <ButtonGroup fullWidth variant="contained" color="primary">
+          <Button
+            color="primary"
+            component={Link}
+            to="/join"
+            className="mainButton" 
+          >
+            Join a Room
+          </Button>
+          <Button
+            color="secondary"
+            component={Link}
+            to="/create"
+            className="mainButton"
+          >
+            Create a Room
+          </Button>
+        </ButtonGroup>
+      </Grid>
+      <Grid item xs={12} align="center">
+        <ButtonGroup fullWidth variant="contained" color="default">
+          <Button component={Link} to="/info">
+            Info
+          </Button>
+        </ButtonGroup>
+      </Grid>
+    </Grid>
     );
   }
 
@@ -69,6 +95,7 @@ export default class HomePage extends Component {
           }
         />
         <Route path="/join" element={<RoomJoinPage />} />
+        <Route path="/info" element={<Info />} />
         <Route path="/create" element={<CreateRoomPage />} />
       </Routes>
       </div>

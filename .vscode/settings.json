@@ -4,6 +4,7 @@
         "path/to/your/project"
     ],
     "python.analysis.completeFunctionParens": true,
+    "python.analysis.typeCheckingMode": "basic",
     // Other settings...
 }
 
