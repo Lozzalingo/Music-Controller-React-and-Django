@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Grid, Button, Typography } from "@material-ui/core";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { Button, Grid, Typography } from "@mui/material";
 import CreateRoomPage from "./CreateRoomPage";
 import MusicPlayer from "./MusicPlayer";
 
@@ -22,6 +22,7 @@ function Room() {
     fetch("/spotify/is-authenticated")
       .then((response) => response.json())
       .then((data) => {
+        if (!isComponentMounted) return; // Check if component is mounted
         setRoomDetails((prevState) => ({
           ...prevState,
           spotifyAuthenticated: data.status,
@@ -30,6 +31,7 @@ function Room() {
           fetch("/spotify/get-auth-url")
             .then((response) => response.json())
             .then((data) => {
+              if (!isComponentMounted) return; // Check if component is mounted
               window.location.replace(data.url);
             });
         }
@@ -38,30 +40,33 @@ function Room() {
 
   const getCurrentSong = () => {
     fetch("/spotify/current-song")
-    .then((response) => {
-      if (!response.ok) {
-        return {};
-      } else {
-        return response.json();
-      }
-    })
-    .then((data) => {
-      setRoomDetails((prevState) => ({
-        ...prevState,
-        song: data,
-      }));
-      console.log(data);
-    });
+      .then((response) => {
+        if (!response.ok) {
+          return {};
+        } else {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        if (!isComponentMounted) return; // Check if component is mounted
+        setRoomDetails((prevState) => ({
+          ...prevState,
+          song: data,
+        }));
+        console.log(data);
+      });
   };
 
   const getRoomDetails = async () => {
     try {
       const response = await fetch(`/api/get-room?code=${roomCode}`);
       if (!response.ok) {
+        if (!isComponentMounted) return; // Check if component is mounted
         navigate("/");
         return;
       }
       const data = await response.json();
+      if (!isComponentMounted) return; // Check if component is mounted
       setRoomDetails({
         votesToSkip: data.votes_to_skip,
         guestCanPause: data.guest_can_pause,
@@ -75,23 +80,31 @@ function Room() {
     }
   };
 
-  useEffect(() => {
-    getRoomDetails();
-    getCurrentSong(); // Fetch the current song when the component mounts
-  }, [roomCode, navigate]);
-
+  // Add a state variable to track if the component is mounted
+  const [isComponentMounted, setIsComponentMounted] = useState(true);
 
   useEffect(() => {
     getRoomDetails();
     getCurrentSong(); // Fetch the current song when the component mounts
+
+    // Set isComponentMounted to true when the component mounts
+    setIsComponentMounted(true);
 
     // Equivalent to componentDidMount
-    const interval = setInterval(getCurrentSong, 1000);
+    const interval = setInterval(() => {
+      // Check if the component is still mounted before updating state
+      if (isComponentMounted) {
+        getCurrentSong();
+      }
+    }, 1000);
 
     // Equivalent to componentWillUnmount
-    return () => clearInterval(interval);
-  }, [roomCode, navigate]);
-
+    return () => {
+      // Set isComponentMounted to false when the component unmounts
+      setIsComponentMounted(false);
+      clearInterval(interval);
+    };
+  }, [roomCode, navigate, isComponentMounted]);
 
   const leaveButtonPressed = async () => {
     try {
@@ -120,15 +133,15 @@ function Room() {
             guestCanPause={roomDetails.guestCanPause}
             roomCode={roomCode}
             updateCallback={getRoomDetails}
-            className="mediumWidth"  
+            className="mediumWidth"
           />
         </Grid>
         <Grid item xs={12} align="center">
           <Button
             variant="contained"
-            color="secondary"
+            color="secondaryCustom"
             onClick={() => updateShowSettings(false)}
-            className="mediumWidth"  
+            className="mediumWidth"
           >
             Close
           </Button>
@@ -140,16 +153,20 @@ function Room() {
   const RenderSettingsButton = () => {
     if (roomDetails.isHost) {
       return (
-        <Grid item xs={12} align="center">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => updateShowSettings(true)}
-            className="mediumWidth"  
-          >
-            Settings
-          </Button>
-        </Grid>
+        <Button
+          variant="contained"
+          color="primaryCustom"
+          onClick={() => updateShowSettings(true)}
+          className="mediumWidth"
+          style={{
+            marginRight: "5px",
+            marginLeft: "5px",
+            marginTop: "5px",
+            marginBottom: "5px",
+          }}
+        >
+          Settings
+        </Button>
       );
     }
     return null;
@@ -172,16 +189,53 @@ function Room() {
         <Grid item xs={12} align="center">
           {}
         </Grid>
-        <RenderSettingsButton />
         <Grid item xs={12} align="center">
           <Button
+            component={Link}
+            to="/request-song"
             variant="contained"
-            color="secondary"
+            color="quaternaryCustom"
+            className="mediumWidth"
+            style={{
+              marginRight: "5px",
+              marginLeft: "5px",
+              marginTop: "5px",
+              marginBottom: "5px",
+            }}
+            //onClick={requestSongButtonPressed}
+          >
+            Request Song
+          </Button>
+          <Button
+            component={Link}
+            to="/queue"
+            variant="contained"
+            color="tertiaryCustom"
+            className="mediumWidth"
+            style={{
+              marginRight: "5px",
+              marginLeft: "5px",
+              marginTop: "5px",
+              marginBottom: "5px",
+            }}
+          >
+            See Requests
+          </Button>
+          <Button
+            variant="contained"
+            color="secondaryCustom"
             onClick={leaveButtonPressed}
-            className="mediumWidth"  
+            className="mediumWidth"
+            style={{
+              marginRight: "5px",
+              marginLeft: "5px",
+              marginTop: "5px",
+              marginBottom: "5px",
+            }}
           >
             Leave Room
           </Button>
+          <RenderSettingsButton />
         </Grid>
       </Grid>
     );

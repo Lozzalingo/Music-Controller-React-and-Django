@@ -42,3 +42,22 @@ body {
 .mediumWidth {
   width: 200px;
 }
+
+.message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.message.visible {
+  opacity: 1;
+  pointer-events: auto;
+}

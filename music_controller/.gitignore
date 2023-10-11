@@ -2,6 +2,7 @@
 node_modules/
 __pycache__/
 **/node_modules
+spotify/credentials.py
 
 frontend/node_modules/.DS_Store
 frontend/node_modules/.package-lock.json

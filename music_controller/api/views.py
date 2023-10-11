@@ -8,8 +8,6 @@ from django.http import JsonResponse
 
 
 # Create your views here.
-
-
 class RoomView(generics.ListAPIView):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
@@ -30,7 +28,6 @@ class GetRoom(APIView):
             return Response({'Room Not Found': 'Invalid Room Code.'}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'Bad Request': 'Code parameter not found in request'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class JoinRoom(APIView):
@@ -81,17 +78,19 @@ class CreateRoomView(APIView):
                 return Response(RoomSerializer(room).data, status=status.HTTP_201_CREATED)
 
         return Response({'Bad Request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class UserInRoom(APIView):
-    def get(self,request, format=None):
+    def get(self, request, format=None):
         if not self.request.session.exists(self.request.session.session_key):
             self.request.session.create()
 
         data = {
-            'code' : self.request.session.get('room_code')
+            'code': self.request.session.get('room_code')
         }
         return JsonResponse(data, status=status.HTTP_200_OK)
-    
+
+
 class LeaveRoom(APIView):
     def post(self, request, format=None):
         if 'room_code' in self.request.session:
@@ -103,6 +102,7 @@ class LeaveRoom(APIView):
                 room.delete()
 
         return Response({'Message': 'Success'}, status=status.HTTP_200_OK)
+
 
 class UpdateRoom(APIView):
     serializer_class = UpdateRoomSerializer

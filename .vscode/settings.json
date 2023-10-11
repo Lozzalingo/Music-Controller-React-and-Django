@@ -5,6 +5,10 @@
     ],
     "python.analysis.completeFunctionParens": true,
     "python.analysis.typeCheckingMode": "basic",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none",
     // Other settings...
 }
 
